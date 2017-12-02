@@ -1,4 +1,4 @@
-testImages = {'0186.png', '0236.png', '0845.png', '0234.png'};
+testImages = {'0084.png', '0236.png', '0845.png', '0234.png'};
 testNames   = {'smallBWeight', 'moderateBWeight', 'largerBWeight', 'hugeBWeight', 'largeRefactorRadius', 'nonZeroLWeight', 'smallK', 'largeK'};
 k           = [100, 100, 100, 100, 100, 100, 50, 200];
 l_weights   = [0, 0, 0, 0, 0, 0.1, 0, 0];
@@ -6,7 +6,7 @@ a_weight    = 0.01;
 b_weights   = [0.05, 0.1, 0.2, 0.4, 0.1, 0.1, 0.1, 0.1];
 seRadius    = [5, 5, 5, 5, 10, 5, 5, 5];
 
-for i = 1:10
+for i = 1:8
     fprintf('===============Experiment %i: %s==============\n', i, char(testNames(i)));
     imageArray = [];
     pixelLabelsArray = [];
