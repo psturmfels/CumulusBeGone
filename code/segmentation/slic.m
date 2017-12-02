@@ -13,12 +13,20 @@ function [pixelLabels, pixelClusterDistances, Am] = slic(im, k, l_weight, a_weig
     im = rgb2lab(im); 
 
     %% Set up initial cluster spacing parameters
-    S = sqrt(rows*cols / (k * sqrt(3)/2));
-    numberNodeColumns = round(cols/S - 0.5);
-    S = cols/(numberNodeColumns + 0.5); 
-    numberNodeRows = round(rows/(sqrt(3)/2*S));
-    rowSpacing = rows/numberNodeRows;
+    % Note: clusters initialize in a square grid regardless of image
+    % size because I am too lazy to factor k 
+    rootImageLength = sqrt(rows * cols);
+    S = rootImageLength / sqrt(k);
+    
+    numberNodesSide = round((rootImageLength - 0.5 * S) / S);
+    columnSpacing = floor(cols / (numberNodesSide + 0.5));
+    rowSpacing = floor(rows / (numberNodesSide + 0.5));
+    
+    numberNodeColumns = ceil((cols - columnSpacing * 0.5) / columnSpacing);
+    numberNodeRows = ceil((rows - rowSpacing * 0.5) / rowSpacing);
+    
     k = numberNodeRows * numberNodeColumns;
+    S = round(S);
     
     %% Initialize Clusters
     Clusters = zeros(6, k); %[L, A, B, columnPos, rowPos, numberOfPixelsInCluster]
@@ -28,11 +36,7 @@ function [pixelLabels, pixelClusterDistances, Am] = slic(im, k, l_weight, a_weig
     for rowIndex = 1:numberNodeRows
         for columnIndex = 1:numberNodeColumns
             clusterRow = round(rowSpacing * (rowIndex - 0.5));
-            if mod(rowIndex, 2)
-                clusterCol = round(S * (columnIndex - 0.5));
-            else 
-                clusterCol = round(S * columnIndex);
-            end
+            clusterCol = round(columnSpacing * (columnIndex - 0.5));
             Clusters(1:6, clusterCount) = [squeeze(im(clusterRow, clusterCol, :)); clusterCol; clusterRow; 1];
             clusterCount = clusterCount + 1;
         end
