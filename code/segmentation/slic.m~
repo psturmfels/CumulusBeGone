@@ -1,0 +1,68 @@
+function [l, Am, Sp, d] = slic(im, k, l_weight, a_weight, b_weight, seRadius, colopt, nItr)
+    %% Read in image, set default variables
+    if ~exist('nItr','var') || isempty(nItr)
+        nItr = 10;  
+    end
+    
+    [rows, cols, chan] = size(im);
+    if chan ~= 3
+        error('Image must be colour');
+    end
+    
+    %% Convert image to LAB-color space; apparently it is better for color-based clustering
+    im = rgb2lab(im); 
+
+    %% Set up initial cluster spacing parameters
+    % Note: clusters initialize in a square grid regardless of image
+    % size because I am too lazy to factor k 
+    rootImageLength = sqrt(rows * cols);
+    S = rootImageLength / sqrt(k);
+    
+    numberNodesSide = round((rootImageLength - 0.5 * S) / S);
+    columnSpacing = floor(cols / (numberNodesSide + 0.5));
+    rowSpacing = floor(rows / (numberNodesSide + 0.5));
+    
+    numberNodeColumns = ceil((cols - columnSpacing) / columnSpacing);
+    numberNodeRows = ceil((rows - rowSpacing) / rowSpacing);
+    
+    k = numberNodeRows * numberNodeColumns;
+    S = round(S);
+    
+    %% Initialize Clusters
+    Clusters = zeros(6, k); %[L, A, B, rowPos, columnPos, numberOfPixelsInCluster]
+    pixelLabels = -ones(rows, cols);
+    pixelClusterDistances = inf(rows, cols);
+    
+    for rowIndex = 1:numberNodeRows
+        for colIndex = 1:numberColRows
+            clusterRow = round(rowSpacing * (rowIndex - 0.5));
+            clusterCol = round(columnSpacing * (columnIndex - 0.5));
+            Clusters(1:6, kk) = [squeeze(im(clusterRow, clusterCol, :)); clusterRow; clusterCol; 1];
+        end
+    end
+    
+    %% Run Clustering
+    for n = 1:nItr
+        for clusterIndex = 1:k
+            %% Update pixels in cur
+            pixelRowMin = max(Clusters(4, clusterIndex) - S, 1);
+            pixelRowMax = min(Clusters(4, clusterIndex) + S, rows);
+            
+            pixelColMin = max(Clusters(5, clusterIndex) - S, 1);
+            pixelColMax = mi(Clusters(5, clusterIndex) + S, cols);
+            
+            pixelWindow = im(pixelRowMin:pixelRowMax, pixelColMin:pixelColMax, :);
+            pixelClusterDistWindow = dist(Clusters(:, kk), pixelWindow, pixelRowMin, pixelColMin, S, l_weight, a_weight, b_weight);
+            
+            windowClippedDistances =  pixelClusterDistances(rmin:rmax, cmin:cmax);
+            windowClippedLabels = pixelLabels(rmin:rmax, cmin:cmax);
+            updateMask = pixelClusterDistWindow < windowClippedDistances;
+            windowClippedDistances(updateMask) = pixelClusterDistWindow(updateMask);
+            windowClippedLabels(updateMask) = clusterIndex;
+           
+            pixelClusterDistances(rmin:rmax, cmin:cmax) = windowClippedDistances;
+            pixelLabels(rmin:rmax, cmin:cmax) = windowClippedLabels; 
+        end
+    end
+    
+end
