@@ -38,5 +38,5 @@ function displaySegmentations(imageArray, pixelLabelsArray, plotRows, plotCols, 
         BW = boundarymask(pixelLabels);
         imshow(imoverlay(im, BW, 'cyan'));
     end
-    suptitle(title);
+    %suptitle(title);
 end
