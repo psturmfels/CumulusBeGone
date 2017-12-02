@@ -3,6 +3,21 @@ function [pixelLabels, pixelClusterDistances, Am] = slic(im, k, l_weight, a_weig
     if ~exist('nItr','var') || isempty(nItr)
         nItr = 10;  
     end
+    if ~exist('k','var') || isempty(k)
+        k = 100;  
+    end
+    if ~exist('l_weight','var') || isempty(l_weight)
+        l_weight = 0.01;  
+    end
+    if ~exist('a_weight','var') || isempty(a_weight)
+        a_weight = 0.05;  
+    end
+    if ~exist('b_weight','var') || isempty(b_weight)
+        b_weight = 0.2;  
+    end
+    if ~exist('seRadius','var') || isempty(seRadius)
+        seRadius = 10;  
+    end
     
     [rows, cols, chan] = size(im);
     if chan ~= 3
