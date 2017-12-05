@@ -99,8 +99,8 @@ function im = inpaint(im, pixelMask)
                 for colorChannel = 1:numberChannels
                     %Do random texture sampling
                     
-                    if (index < pointsAddedDuringExpansion) 
-                        im(neighborRow, neighborCol, colorChannel) = (1 - index / pointsAddedDuringExpansion) * inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel) + (index / pointsAddedDuringExpansion) * im(neighborRow, neighborCol, colorChannel);
+                    if (index < pointsAddedDuringExpansion * 0.5) 
+                        im(neighborRow, neighborCol, colorChannel) = (1 - index / (pointsAddedDuringExpansion * 0.5)) * inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel) + (index / (pointsAddedDuringExpansion*0.5)) * im(neighborRow, neighborCol, colorChannel);
                     else 
                         if (neighborRow > 1 && neighborRow < numberRows && neighborCol > 1 && neighborCol < numberCols)
                             randWindowHalfSize = 100;
@@ -109,7 +109,7 @@ function im = inpaint(im, pixelMask)
                             selectedRow = datasample(randRowChoices, 1);
                             selectedCol = datasample(randColChoices, 1);
                             if (F(selectedRow, selectedCol) == KNOWN)
-                                im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) = 0.8*im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) + 0.2 * im((selectedRow-1):(selectedRow+1), (selectedCol-1):(selectedCol+1), colorChannel);
+                                im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) = 0.9*im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) + 0.1 * im((selectedRow-1):(selectedRow+1), (selectedCol-1):(selectedCol+1), colorChannel);
                             end
                         end
                         im(neighborRow, neighborCol, colorChannel) = inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel);
