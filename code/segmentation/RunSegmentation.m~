@@ -26,7 +26,7 @@ function  [im, pixelLabels, pixelClusterDistances, Am] = segmentImage(imageName,
         imageDir = '../../data/swimseg/images/';  
     end
     im = imread(strcat(imageDir, imageName));
-    [pixelLabels, pixelClusterDistances, Am, ~] = slic(im, k, l_weight, a_weight, b_weight, seRadius);
+    [pixelLabels, pixelClusterDistances, Am, Clust] = slic(im, k, l_weight, a_weight, b_weight, seRadius);
 end
 
 function displaySegmentations(imageArray, pixelLabelsArray, plotRows, plotCols, title)

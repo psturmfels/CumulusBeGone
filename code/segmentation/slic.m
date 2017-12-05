@@ -1,4 +1,4 @@
-function [pixelLabels, pixelClusterDistances, Am] = slic(im, k, l_weight, a_weight, b_weight, seRadius, nItr)
+function [pixelLabels, pixelClusterDistances, Am, Clusters] = slic(im, k, l_weight, a_weight, b_weight, seRadius, nItr)
     %% Read in image, set default variables
     if ~exist('nItr','var') || isempty(nItr)
         nItr = 10;  
