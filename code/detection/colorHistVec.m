@@ -23,8 +23,8 @@ for j=1:numChannels
     singleChan = image(:,:,j);
     singleSPChan = singleChan(pixelLabels == superpixelID);
     curHist = imhist(singleSPChan, b);
-    %curHistNorm = curHist / norm(curHist, 1); %normalized histogram
-    histSP = [histSP; curHist];
+    curHistNorm = curHist / sum(curHist(:)); %curHist / norm(curHist, 1); %normalized histogram
+    histSP = [histSP; curHistNorm];
 end
 
 histVec = histSP;
