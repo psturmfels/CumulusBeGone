@@ -3,13 +3,10 @@ function ReplaceClouds(im)
     addpath('replacement/');
     addpath('detection/');
 
-    load('DecisionTreeClassifier');
-    load('averageCloudHistVec');
-    load('averageSkyHistVec');
-    [pixelLabels, ~, ~, Clusters] = slic(im);
+    [pixelLabels, ~, ~, Clusters] = slic(im, 400, 0.01, 0.05, 0.1, 3);
     bw = boundarymask(pixelLabels);
-    [pixelMask, ~] = classifier(im, B, pixelLabels, Clusters);
-    replacedImage = inpaint(im, pixelMask);
+    [skyCloudPixelMask, pixelMask] = simpleClassifier(im, averageCloudHistVec, averageSkyHistVec, pixelLabels, Clusters);
+    replacedImage = inpaint(im, pixelMask, skyCloudPixelMask);
 
     subplot(2,2,1);
     imshow(im);

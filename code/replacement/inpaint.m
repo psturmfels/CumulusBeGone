@@ -16,7 +16,7 @@ function im = inpaint(im, pixelMask, skyCloudPixelMask)
     BAND = 1;
     INSIDE = 2;
     
-    SKY = 2;
+    UNKNOWN = 0;
 
     %Initialize flags
     F = zeros(size(pixelMask));
@@ -51,7 +51,7 @@ function im = inpaint(im, pixelMask, skyCloudPixelMask)
             for neighborIndex = neighbors'            
                 neighborRow = neighborIndex(1);
                 neighborCol = neighborIndex(2);
-                if (F(neighborRow, neighborCol) == KNOWN && skyCloudPixelMask(neighborRow, neighborCol) == SKY)
+                if (F(neighborRow, neighborCol) == KNOWN && skyCloudPixelMask(neighborRow, neighborCol) ~= UNKNOWN)
                     F(neighborRow, neighborCol) = BAND;
                     numberOfBoundaryPoints = numberOfBoundaryPoints + 1;
                     pointsAddedDuringExpansion = pointsAddedDuringExpansion + 1;
@@ -102,7 +102,7 @@ function im = inpaint(im, pixelMask, skyCloudPixelMask)
                     %Do random texture sampling
                     
                     if (index < pointsAddedDuringExpansion * 0.5) 
-                        im(neighborRow, neighborCol, colorChannel) = (1 - index / (pointsAddedDuringExpansion * 0.5)) * inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel) + (index / (pointsAddedDuringExpansion*0.5)) * im(neighborRow, neighborCol, colorChannel);
+                        im(neighborRow, neighborCol, colorChannel) = (1 - index / (pointsAddedDuringExpansion * 0.5)) * inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel, skyCloudPixelMask) + (index / (pointsAddedDuringExpansion*0.5)) * im(neighborRow, neighborCol, colorChannel);
                     else 
                         if (neighborRow > 1 && neighborRow < numberRows && neighborCol > 1 && neighborCol < numberCols)
                             randWindowHalfSize = 100;
@@ -110,11 +110,11 @@ function im = inpaint(im, pixelMask, skyCloudPixelMask)
                             randColChoices = max(2, neighborCol - randWindowHalfSize):min(numberCols-2, neighborCol + randWindowHalfSize);
                             selectedRow = datasample(randRowChoices, 1);
                             selectedCol = datasample(randColChoices, 1);
-                            if (F(selectedRow, selectedCol) == KNOWN)
+                            if (F(selectedRow, selectedCol) == KNOWN && skyCloudPixelMask(selectedRow, selectedCol) ~= UNKNOWN)
                                 im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) = 0.9*im((neighborRow-1):(neighborRow+1), (neighborCol-1):(neighborCol+1), colorChannel) + 0.1 * im((selectedRow-1):(selectedRow+1), (selectedCol-1):(selectedCol+1), colorChannel);
                             end
                         end
-                        im(neighborRow, neighborCol, colorChannel) = inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel);
+                        im(neighborRow, neighborCol, colorChannel) = inpaintPixel(im, F, boundaryDistance, neighborRow, neighborCol, colorChannel, skyCloudPixelMask);
                     end
                 end
                 if (F(neighborRow, neighborCol) == INSIDE)
@@ -127,12 +127,13 @@ function im = inpaint(im, pixelMask, skyCloudPixelMask)
     end
 end
 
-function newPixelValue = inpaintPixel(im, F, boundaryDistance, row, col, colorChannel)
+function newPixelValue = inpaintPixel(im, F, boundaryDistance, row, col, colorChannel, skyCloudPixelMask)
     [numberRows, numberCols, ~] = size(im);
     runningVariance = 0;
     runningMean = 0;
     n = 0;
     KNOWN = 0;
+    UNKNOWN = 0;
     BAND = 1;
     INSIDE = 2;
     windowHalfSize = 5;
@@ -140,7 +141,7 @@ function newPixelValue = inpaintPixel(im, F, boundaryDistance, row, col, colorCh
     s = 0;
     for neighborRow = max(2, row - windowHalfSize):min(numberRows-2, row + windowHalfSize)
         for neighborCol = max(2, col - windowHalfSize):min(numberCols-2, col + windowHalfSize)
-            if F(neighborRow, neighborCol) == KNOWN
+            if F(neighborRow, neighborCol) == KNOWN && skyCloudPixelMask(neighborRow, neighborCol) ~= UNKNOWN
                 n = n + 1;
                 rowDist = row - neighborRow;
                 colDist = col - neighborCol;
