@@ -144,7 +144,7 @@ function newPixelValue = inpaintPixel(im, F, boundaryDistance, row, col, colorCh
                 colDist = col - neighborCol;
                 distLength = sqrt(rowDist^2 + colDist^2);
                 
-                w = 1 / (distLength^2 + 100*boundaryDistance(neighborRow, neighborCol));
+                w = boundaryDistance(neighborRow, neighborCol) / (distLength^2 + boundaryDistance(neighborRow, neighborCol));
                 
                 pixel = im(neighborRow, neighborCol, colorChannel);
                 Ia = Ia + w * pixel;
