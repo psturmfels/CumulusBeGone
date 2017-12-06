@@ -16,7 +16,7 @@ numSuperPixels = size(Clusters, 2);
 %Classify superpixels accordingly
 TestData = [];
 for i=1:numSuperPixels
-    hist = colorHistVec(NUM_BINS, pixelLabels, numSuperPixels, image, i);
+    hist = colorHistVec(NUM_BINS, pixelLabels, image, i);
     TestData = [TestData; hist'];
 end
 

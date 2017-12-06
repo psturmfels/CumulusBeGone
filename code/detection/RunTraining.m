@@ -1,6 +1,6 @@
 NUM_BINS = 50;
 K = 100;
-NUM_TRAINDATA = 400;
+NUM_TRAINDATA = 999;
 NUM_TREES = 500;
 %Get data and labels for decision tree classifier
 [X, Labels] = meanColorHist(NUM_BINS, K, NUM_TRAINDATA);

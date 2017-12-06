@@ -1,4 +1,4 @@
-function im = inpaint(im, pixelMask)
+function im = inpaint(im, pixelMask, skyCloudPixelMask)
     im = im2double(im);
     pixelMask = im2double(pixelMask);
     [numberRows, numberCols, numberChannels] = size(im);
@@ -15,6 +15,8 @@ function im = inpaint(im, pixelMask)
     KNOWN = 0;
     BAND = 1;
     INSIDE = 2;
+    
+    SKY = 2;
 
     %Initialize flags
     F = zeros(size(pixelMask));
@@ -49,7 +51,7 @@ function im = inpaint(im, pixelMask)
             for neighborIndex = neighbors'            
                 neighborRow = neighborIndex(1);
                 neighborCol = neighborIndex(2);
-                if (F(neighborRow, neighborCol) == KNOWN)
+                if (F(neighborRow, neighborCol) == KNOWN && skyCloudPixelMask(neighborRow, neighborCol) == SKY)
                     F(neighborRow, neighborCol) = BAND;
                     numberOfBoundaryPoints = numberOfBoundaryPoints + 1;
                     pointsAddedDuringExpansion = pointsAddedDuringExpansion + 1;

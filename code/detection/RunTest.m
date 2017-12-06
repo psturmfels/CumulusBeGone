@@ -1,0 +1,13 @@
+im = imresize(im2double(imread('TestNaturePhotography2.png')), [600, 600]);
+load('averageCloudHistVec.mat');
+load('averageSkyHistVec.mat');
+%[pixelLabels, ~] = superpixels(im, 100);
+[pixelLabels, ~, ~, Clusters] = slic(im, 400);
+bw = boundarymask(pixelLabels);
+[pixelMask] = simpleClassifier(im, averageCloudHistVec, averageSkyHistVec, pixelLabels, Clusters);
+subplot(1,3,1);
+imshow(im);
+subplot(1,3,2);
+imshow(imoverlay(im, bw, 'cyan'));
+subplot(1,3,3);
+imshow(imoverlay(pixelMask / 2, bw, 'cyan'));

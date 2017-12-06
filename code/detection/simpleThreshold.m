@@ -16,16 +16,16 @@
 function simpleThreshold(im, ~, ~)
     %[r,c] = size(im);
     
-    threshold = 60;
+    threshold = 20/255;
     
     % Get the R-B channel image
-    diffMap = double(im(:,:,1)) - double(im(:,:,3));
+    diffMap = im(:,:,1) - im(:,:,3);
     diffMap = abs(diffMap);
     
     %binaryImage = zeros(size(diffMap,1), size(diffMap,2));
     binaryImage = diffMap < threshold;
     
-    binaryImageInt = uint8(~binaryImage);
+    binaryImageInt = double(~binaryImage);
     
     maskedImage = im.*repmat(binaryImageInt,[1,1,3]);
     

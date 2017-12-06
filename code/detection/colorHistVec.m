@@ -1,10 +1,9 @@
-function histVec = colorHistVec(b, pixelLabels, k, image, superpixelID)
+function histVec = colorHistVec(pixelLabels, image, superpixelID)
 %
 %Computes a color histograms for superpixel with id 'superpixelID'. 
 %
 %Arguments: b - number of bins for each channel histogram
 %           pixelLabels - output of SLIC segmentation
-%           k - number of superpixels
 %           image - input image
 %           superpixelID - id of superpixel for which we want a histogram
 %
@@ -17,17 +16,19 @@ end
   
 numChannels = size(image, 3);
 histVec = zeros(3*b, 1);
+edges = -50:5:50;
 
 histSP = [];
-for j=1:numChannels
+for j=2:numChannels
     singleChan = image(:,:,j);
     singleSPChan = singleChan(pixelLabels == superpixelID);
-    curHist = imhist(singleSPChan, b);
+    [curHist, ~] = histcounts(singleSPChan, edges);
+    curHist = curHist';
     curHistNorm = curHist / sum(curHist(:)); %curHist / norm(curHist, 1); %normalized histogram
     histSP = [histSP; curHistNorm];
 end
 
-histVec = histSP;
+histVec = histSP';
 
         
         

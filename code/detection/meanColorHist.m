@@ -34,11 +34,21 @@ while (numImage < numTrainData)
         imName = strcat('0', int2str(numImage));
     end
     
-    imageName = strcat(imName, '.png')
+    imageName = strcat(imName, '.png');
+    if (mod(numImage, 50) == 0)
+        fprintf('Trained on images up to %s\n', imageName);
+    end
     GTName = strcat(imName, '_GT.png');
-    im = imread(strcat(imageDir, imageName));
-    imGT = imread(strcat(GTDir, GTName));
+    im = im2double(imread(strcat(imageDir, imageName)));
+    imGT = im2double(imread(strcat(GTDir, GTName)));
     
+    X = [X; (colorHistVec(b, imGT, im, 1))'];
+    Labels = [Labels; 1];
+    
+    X = [X; (colorHistVec(b, imGT, im, 0))'];
+    Labels = [Labels; 0];
+    
+    %{
     %Call slic for each RGB image
     [pixelLabels, ~, ~, Clusters] = slic(im, k);
     numSuperPixels = size(Clusters, 2);
@@ -53,7 +63,8 @@ while (numImage < numTrainData)
             Labels = [Labels; 0];
         end
     end
+    %}
    
-    numImage = numImage + 2;
+    numImage = numImage + 1;
 end
     
